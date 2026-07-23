@@ -1,7 +1,7 @@
 <?php
-$var = "prova";
+$input = $_GET['user']; // 1. Source (Tainted)
 
-$var2 = $var . " ehy!";
+$sql = "SELECT * WHERE name=" . $input; // 2. Propagazione
 
-echo $var . " - " . $var2;
+pg_query($db, $sql); // 3. Sink (Vulnerable!)
 ?>
