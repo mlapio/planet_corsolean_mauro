@@ -24,7 +24,8 @@ jobs:
             if [ -f "$file" ]; then php -l "$file"; fi
           done
  
+      - name: Installazione Semgrep
+        run: python3 -m pip install semgrep
+ 
       - name: Analisi statica con Semgrep (SAST)
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: p/security-audit
+        run: semgrep scan --config p/default --config p/php --config p/owasp-top-ten --error
