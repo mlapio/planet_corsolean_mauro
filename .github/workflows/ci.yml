@@ -1,0 +1,30 @@
+name: Pull Request Quality Gate
+ 
+on:
+  pull_request:
+    branches: [ main ]
+ 
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codice modificato
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+ 
+      - name: Configurazione PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+ 
+      - name: Linting sintattico incrementale
+        run: |
+          for file in $(git diff --name-only origin/main...HEAD | grep '\.php$'); do
+            if [ -f "$file" ]; then php -l "$file"; fi
+          done
+ 
+      - name: Analisi statica con Semgrep (SAST)
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: p/security-audit
