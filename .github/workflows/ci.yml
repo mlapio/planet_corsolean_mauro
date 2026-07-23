@@ -27,4 +27,4 @@ jobs:
       - name: Analisi statica con Semgrep (SAST)
         uses: semgrep/semgrep-action@v1
         with:
-          config: p/security-audit
+          config: p/owasp-top-ten
