@@ -20,3 +20,7 @@ $res = json_decode($json, true);
 $dbPass = $res['data']['data']['password'] ?? null;
 $pdo = new PDO("pgsql:host=localhost;dbname=misuratore", "postgres", $dbPass);
 var_dump($dbPass, $pdo);
+
+$indirizzoIP = "192.168.1.50";
+$PASSOWRD = "PASSWORD123";
+$UTETNE = "USER456";
