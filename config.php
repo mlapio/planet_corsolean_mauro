@@ -18,6 +18,7 @@ $res = json_decode($json, true);
 
 // 4. Password caricata solo in RAM & Connessione PDO
 $dbPass = $res['data']['data']['password'] ?? null;
+$dbPass = "postgres";
 $pdo = new PDO("pgsql:host=localhost;dbname=misuratore", "postgres", $dbPass);
 var_dump($dbPass, $pdo);
 
