@@ -22,5 +22,9 @@ $pdo = new PDO("pgsql:host=localhost;dbname=misuratore", "postgres", $dbPass);
 var_dump($dbPass, $pdo);
 
 $indirizzoIP = "192.168.1.50";
-$PASSOWRD = "PASSWORD123";
-$UTETNE = "USER456";
+$PASSWORD = "PASSWORD123";
+$USER = "USER456";
+
+$SECRET = "S3cr3t!";
+
+var_dump($indirizzoIP, $PASSWORD, $USER, $SECRET);
