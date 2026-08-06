@@ -1,0 +1,46 @@
+name: Ticka Core Quality Gate (PHP)
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  php-quality-gate:
+    name: Lint, Test & Package PHP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: dom, xml, curl, mbstring
+          coverage: pcov
+
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist
+        
+      - name: Run PHP Syntax Check (Lint)
+        run: |
+          SUCCESS=true
+          for file in $(find . -name "*.php" -not -path "./vendor/*"); do
+            php -l "$file" || SUCCESS=false
+          done
+          if [ "$SUCCESS" = false ]; then
+            echo "Errore sintattico rilevato nei file PHP!"
+            exit 1
+          fi
+      
+      - name: Run PHPUnit Tests
+        run: vendor/bin/phpunit --log-junit reports/junit.xml --coverage-cobertura reports/cobertura.xml
+      
+      - name: Archive Code Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ticka-web-package-${{ github.sha }}
+          path: |
+            .
+            !vendor
+            !reports
