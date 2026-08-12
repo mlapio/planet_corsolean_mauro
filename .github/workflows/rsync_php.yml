@@ -1,0 +1,31 @@
+name: Continuous Delivery - Ticka .NET Staging
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy-dotnet-staging:
+    name: Deploy PHP to staging
+    runs-on: ubuntu-latest
+    environment: Staging
+    steps:
+      - name: Install Production Dependencies
+        run: composer install --no-dev --optimize-autoloader
+      - name: Generate Config File
+        env:
+          DB_PASS: ${{ secrets.DB_PASS }}
+        run: envsubst < config.template.php > config.php
+      - name: Setup SSH Key & Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
+
+      - name: Add Host to Known Hosts (Anti-MITM)
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p 22 -H "staging.planet.it" >> ~/.ssh/known_hosts
+      - name: Deploy PHP Application via rsync
+        run: |
+          rsync -az --delete --exclude=".git/" --exclude="tests/" ./ user@client-server:/var/www/ticka/
