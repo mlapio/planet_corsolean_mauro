@@ -1,0 +1,39 @@
+name: Main release PHP
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codice modificato
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+        with:
+          fetch-depth: 0
+
+      - name: Calcola versione
+        id: tag_version
+        uses: mathieudutour/github-tag-action@a22cf08638b34d5badda920f9daf6e72c477b07b
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+
+      - name: Genera version.json
+        run: echo '{"version":"'${{ steps.tag_version.outputs.new_tag }}'"}' > version.json        
+      
+      - name: Build pacchetto
+        run: tar -czf ticka-${{ steps.tag_version.outputs.new_tag }}.tar.gz version.json
+
+      - name: Genera SHA-256
+        run: sha256sum ticka-${{ steps.tag_version.outputs.new_tag }}.tar.gz > ticka-${{ steps.tag_version.outputs.new_tag }}.tar.gz.sha256
+
+      - name: Crea release GitHub
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+          artifacts: "ticka-${{ steps.tag_version.outputs.new_tag }}.tar.gz*"
+          token: ${{ secrets.GITHUB_TOKEN }}
