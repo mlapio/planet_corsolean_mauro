@@ -489,18 +489,24 @@ namespace MFLibEF.Business
         ////    return res == "1";
         ////}
 
-        private static string ElaboraFormatoTitolo(Formatotitolo formatotitolo, TransazioniLog transazioniLog,
-            string ordinepostoDescrizione, string nome, string cognome, string background)
+        private static string ElaboraFormatoTitolo(
+            Formatotitolo formatotitolo,
+            TransazioniLog transazioniLog,
+            string ordinepostoDescrizione,
+            string background
+        )
         {
-            string risultato = ElaboraFormatoTitoloBase(formatotitolo, transazioniLog, background);
+            // Estraggo l'ordine posto dal codice del transazioniLog
+            OrdinePosto ordineposto = DomainObjectManager.GetOrdinePosto(transazioniLog.OrdinepostoCodice)
+                ?? throw new Exception("Ordineposto non trovato");
 
-            //specifico per specie B
-            var ordineposto = DomainObjectManager.GetOrdinePosto(transazioniLog.OrdinepostoCodice) ?? throw new Exception("Ordineposto non trovato");
-            risultato = risultato.Replace("%ordineposto_descrizione%",
-                ordinepostoDescrizione == "" ? ordineposto.Descrizione : ordinepostoDescrizione);
-            risultato = risultato.Replace("%ordineposto_siae%", ordineposto.Descrizione);
+            // Imposto la descrizione dell'ordine posto usando quella dell'ordine posto solo se non passata come parametro
+            ordinePostoDescrizione ??= ordineposto.Descrizione;
 
-            return risultato;
+            // Sostituisco le variabili nel risultato dell'elaborazione del formato titolo
+            return ElaboraFormatoTitoloBase(formatotitolo, transazioniLog, background);
+                .Replace("%ordineposto_descrizione%", ordinepostoDescrizione)
+                .Replace("%ordineposto_siae%", ordineposto.Descrizione);
         }
 
         private static string GetPostoPrefisso(int eventoId)
