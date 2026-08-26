@@ -190,6 +190,8 @@ namespace MFLibEF.Business
             DateTime dataOraRegistrazione, string cellulareAcquirente, string emailAcquirente,
             string autenticazione, int acquirenteId, int? utilizzatoreId, int? rivenditoreId,
             string fila = "", string varco = "", string prestampa = "", bool testMode = false)
+        //32 parameter
+        
         {
             using MisuratoreContext db = new();
 
@@ -300,12 +302,12 @@ namespace MFLibEF.Business
             reader.Read();
 
             if (reader.Name == "error")
-                throw new Exception(res[..255]);
+                throw new Exception(res[..255]); //truncated error 
 
             if (testMode)
                 return null;
 
-            reader.Read();
+            reader.Read(); //reader read duplicato
 
             int id = Convert.ToInt32(reader.GetAttribute("id"));
 
